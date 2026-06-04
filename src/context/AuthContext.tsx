@@ -116,6 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Mock reset password function
   const resetPassword = async (token: string, newPassword: string): Promise<void> => {
     try {
+      void newPassword;
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       

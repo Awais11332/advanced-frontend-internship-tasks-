@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MessageCircle, Building2, MapPin, UserCircle, BarChart3, Briefcase } from 'lucide-react';
+import { MessageCircle, Building2, MapPin, UserCircle, BarChart3, Briefcase, Calendar } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
@@ -65,13 +65,24 @@ export const InvestorProfile: React.FC = () => {
           
           <div className="mt-6 sm:mt-0 flex flex-col sm:flex-row gap-2 justify-center sm:justify-end">
             {!isCurrentUser && (
-              <Link to={`/chat/${investor.id}`}>
-                <Button
-                  leftIcon={<MessageCircle size={18} />}
-                >
-                  Message
-                </Button>
-              </Link>
+              <>
+                <Link to={`/chat/${investor.id}`}>
+                  <Button
+                    variant="outline"
+                    leftIcon={<MessageCircle size={18} />}
+                  >
+                    Message
+                  </Button>
+                </Link>
+                
+                <Link to={`/calendar?hostId=${investor.id}`}>
+                  <Button
+                    leftIcon={<Calendar size={18} />}
+                  >
+                    Book Meeting
+                  </Button>
+                </Link>
+              </>
             )}
             
             {isCurrentUser && (

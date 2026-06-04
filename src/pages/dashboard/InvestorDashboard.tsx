@@ -7,20 +7,24 @@ import { Input } from '../../components/ui/Input';
 import { Badge } from '../../components/ui/Badge';
 import { EntrepreneurCard } from '../../components/entrepreneur/EntrepreneurCard';
 import { useAuth } from '../../context/AuthContext';
-import { Entrepreneur } from '../../types';
-import { entrepreneurs } from '../../data/users';
+import { useMeetings } from '../../context/MeetingContext';
+import { entrepreneurs, findUserById } from '../../data/users';
 import { getRequestsFromInvestor } from '../../data/collaborationRequests';
 
 export const InvestorDashboard: React.FC = () => {
   const { user } = useAuth();
+  const { meetings } = useMeetings();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   
   if (!user) return null;
   
+  const upcomingMeetings = meetings.filter(
+    m => (m.hostId === user.id || m.guestId === user.id) && m.status === 'accepted'
+  );
+  
   // Get collaboration requests sent by this investor
   const sentRequests = getRequestsFromInvestor(user.id);
-  const requestedEntrepreneurIds = sentRequests.map(req => req.entrepreneurId);
   
   // Filter entrepreneurs based on search and industry filters
   const filteredEntrepreneurs = entrepreneurs.filter(entrepreneur => {
@@ -147,40 +151,78 @@ export const InvestorDashboard: React.FC = () => {
         </Card>
       </div>
       
-      {/* Entrepreneurs grid */}
-      <div>
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg font-medium text-gray-900">Featured Startups</h2>
-          </CardHeader>
-          
-          <CardBody>
-            {filteredEntrepreneurs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredEntrepreneurs.map(entrepreneur => (
-                  <EntrepreneurCard
-                    key={entrepreneur.id}
-                    entrepreneur={entrepreneur}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-600">No startups match your filters</p>
-                <Button 
-                  variant="outline" 
-                  className="mt-2"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedIndustries([]);
-                  }}
-                >
-                  Clear filters
-                </Button>
-              </div>
-            )}
-          </CardBody>
-        </Card>
+      {/* Featured Startups and Upcoming Meetings Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-medium text-gray-900">Featured Startups</h2>
+            </CardHeader>
+            
+            <CardBody>
+              {filteredEntrepreneurs.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredEntrepreneurs.map(entrepreneur => (
+                    <EntrepreneurCard
+                      key={entrepreneur.id}
+                      entrepreneur={entrepreneur}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No startups match your filters</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-2"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedIndustries([]);
+                    }}
+                  >
+                    Clear filters
+                  </Button>
+                </div>
+              )}
+            </CardBody>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-1 space-y-4">
+          <Card>
+            <CardHeader className="flex justify-between items-center">
+              <h2 className="text-lg font-medium text-gray-900">Upcoming Meetings</h2>
+              <Link to="/calendar" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+                View Calendar
+              </Link>
+            </CardHeader>
+            <CardBody className="space-y-3">
+              {upcomingMeetings.length === 0 ? (
+                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-md">No upcoming meetings scheduled.</p>
+              ) : (
+                upcomingMeetings.map(meet => {
+                  const otherUser = findUserById(meet.hostId === user.id ? meet.guestId : meet.hostId);
+                  return (
+                    <div key={meet.id} className="p-3 border border-gray-200 rounded-lg space-y-2 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-semibold text-sm text-gray-900">{meet.title}</h4>
+                          <p className="text-xs text-gray-650">With: {otherUser?.name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500 pt-1 border-t border-gray-105">
+                        <span>{meet.date} at {meet.startTime}</span>
+                        <Link to={`/video?room=${meet.videoCallId}`} className="text-primary-650 hover:underline font-semibold">
+                          Join Call
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </CardBody>
+          </Card>
+        </div>
       </div>
     </div>
   );

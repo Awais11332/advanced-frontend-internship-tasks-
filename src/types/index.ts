@@ -79,3 +79,24 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
+
+export interface AvailabilitySlot {
+  id: string;
+  userId: string;
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:MM
+  endTime: string; // HH:MM
+}
+
+export interface Meeting {
+  id: string;
+  hostId: string;
+  guestId: string;
+  title: string;
+  description: string;
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:MM
+  endTime: string; // HH:MM
+  status: 'pending' | 'accepted' | 'declined';
+  videoCallId?: string;
+}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { MeetingProvider } from './context/MeetingContext';
 
 // Layouts
 import { DashboardLayout } from './components/layout/DashboardLayout';
@@ -29,15 +30,17 @@ import { DealsPage } from './pages/deals/DealsPage';
 
 // Chat Pages
 import { ChatPage } from './pages/chat/ChatPage';
+import { CalendarPage } from './pages/calendar/CalendarPage';
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Authentication Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+      <MeetingProvider>
+        <Router>
+          <Routes>
+            {/* Authentication Routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
           
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<DashboardLayout />}>
@@ -58,6 +61,10 @@ function App() {
           
           <Route path="/entrepreneurs" element={<DashboardLayout />}>
             <Route index element={<EntrepreneursPage />} />
+          </Route>
+          
+          <Route path="/calendar" element={<DashboardLayout />}>
+            <Route index element={<CalendarPage />} />
           </Route>
           
           <Route path="/messages" element={<DashboardLayout />}>
@@ -97,8 +104,9 @@ function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
-    </AuthProvider>
-  );
+    </MeetingProvider>
+  </AuthProvider>
+);
 }
 
 export default App;

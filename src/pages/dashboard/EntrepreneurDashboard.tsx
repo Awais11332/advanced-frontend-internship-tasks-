@@ -7,14 +7,19 @@ import { Badge } from '../../components/ui/Badge';
 import { CollaborationRequestCard } from '../../components/collaboration/CollaborationRequestCard';
 import { InvestorCard } from '../../components/investor/InvestorCard';
 import { useAuth } from '../../context/AuthContext';
+import { useMeetings } from '../../context/MeetingContext';
 import { CollaborationRequest } from '../../types';
 import { getRequestsForEntrepreneur } from '../../data/collaborationRequests';
-import { investors } from '../../data/users';
+import { investors, findUserById } from '../../data/users';
 
 export const EntrepreneurDashboard: React.FC = () => {
   const { user } = useAuth();
+  const { meetings } = useMeetings();
+  const upcomingMeetings = meetings.filter(
+    m => (m.hostId === user.id || m.guestId === user.id) && m.status === 'accepted'
+  );
   const [collaborationRequests, setCollaborationRequests] = useState<CollaborationRequest[]>([]);
-  const [recommendedInvestors, setRecommendedInvestors] = useState(investors.slice(0, 3));
+  const recommendedInvestors = investors.slice(0, 3);
   
   useEffect(() => {
     if (user) {
@@ -93,7 +98,7 @@ export const EntrepreneurDashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-accent-700">Upcoming Meetings</p>
-                <h3 className="text-xl font-semibold text-accent-900">2</h3>
+                <h3 className="text-xl font-semibold text-accent-900">{upcomingMeetings.length}</h3>
               </div>
             </div>
           </CardBody>
@@ -147,8 +152,42 @@ export const EntrepreneurDashboard: React.FC = () => {
           </Card>
         </div>
         
-        {/* Recommended investors */}
+        {/* Recommended investors & Upcoming Meetings */}
         <div className="space-y-4">
+          <Card>
+            <CardHeader className="flex justify-between items-center">
+              <h2 className="text-lg font-medium text-gray-900">Upcoming Meetings</h2>
+              <Link to="/calendar" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+                View Calendar
+              </Link>
+            </CardHeader>
+            <CardBody className="space-y-3">
+              {upcomingMeetings.length === 0 ? (
+                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-md">No upcoming meetings scheduled.</p>
+              ) : (
+                upcomingMeetings.map(meet => {
+                  const otherUser = findUserById(meet.hostId === user.id ? meet.guestId : meet.hostId);
+                  return (
+                    <div key={meet.id} className="p-3 border border-gray-200 rounded-lg space-y-2 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-semibold text-sm text-gray-900">{meet.title}</h4>
+                          <p className="text-xs text-gray-650">With: {otherUser?.name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500 pt-1 border-t border-gray-105">
+                        <span>{meet.date} at {meet.startTime}</span>
+                        <Link to={`/video?room=${meet.videoCallId}`} className="text-primary-650 hover:underline font-semibold">
+                          Join Call
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </CardBody>
+          </Card>
+
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Recommended Investors</h2>

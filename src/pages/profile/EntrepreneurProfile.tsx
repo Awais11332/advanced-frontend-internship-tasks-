@@ -102,6 +102,15 @@ export const EntrepreneurProfile: React.FC = () => {
                   </Button>
                 </Link>
                 
+                <Link to={`/calendar?hostId=${entrepreneur.id}`}>
+                  <Button
+                    variant="outline"
+                    leftIcon={<Calendar size={18} />}
+                  >
+                    Book Meeting
+                  </Button>
+                </Link>
+                
                 {isInvestor && (
                   <Button
                     leftIcon={<Send size={18} />}
