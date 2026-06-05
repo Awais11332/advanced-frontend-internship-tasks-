@@ -2,6 +2,8 @@
 
 Nexus is a premium web platform designed to facilitate collaboration, networking, and scheduling between entrepreneurs and investors. This repository contains the enhanced version of the platform with advanced collaboration features, a custom scheduling calendar, and dashboard views.
 
+🔗 **Live Link:** [https://advanced-frontend-internship-tasks-95s86qd5j.vercel.app](https://advanced-frontend-internship-tasks-95s86qd5j.vercel.app)
+
 ---
 
 ## 🚀 Key Features (Week 1 Milestone - Scheduling & Setup)
